@@ -29,6 +29,7 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+       // kotlinCompilerExtensionVersion '1.2.0-alpha08'
     }
     kotlinOptions {
         jvmTarget = '1.8'

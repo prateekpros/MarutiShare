@@ -7,6 +7,7 @@ import android.net.Uri
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -32,6 +33,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+@RequiresApi(Build.VERSION_CODES.M)
 @Composable
 fun Send(navController: NavController,activity: MainActivity){
 
@@ -96,7 +98,7 @@ fun Send(navController: NavController,activity: MainActivity){
                                 ),
                                 onClick = {
                                     CoroutineScope(Dispatchers.IO).launch {
-                                        Server(activity, selectedFiles, activity.filesName, activity = activity)
+                                        Server(activity, selectedFiles,activity.filesName, activity = activity)//
                                     }
                                 }) {
                                 Text("Send it ", color = Color.White)
