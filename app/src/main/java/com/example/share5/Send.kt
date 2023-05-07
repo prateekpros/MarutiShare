@@ -40,6 +40,7 @@ fun Send(navController: NavController,activity: MainActivity){
 
 
     var selectedFiles by rememberSaveable{ mutableStateOf(emptyList<Uri>()) }
+    var fileNameList  by rememberSaveable{ mutableStateOf(emptySet<String>()) }
     Surface(Modifier.fillMaxSize(1f)) {
         val hexColor = 0xFF1F3D
         val buttonColor = Color(hexColor)
@@ -74,6 +75,7 @@ fun Send(navController: NavController,activity: MainActivity){
                     )
                 },
                 content = {
+
                     it
                     Image(
                         painter = painterResource(id = R.drawable.svg_water_wave_animation),
@@ -98,7 +100,7 @@ fun Send(navController: NavController,activity: MainActivity){
                                 ),
                                 onClick = {
                                     CoroutineScope(Dispatchers.IO).launch {
-                                        Server(activity, selectedFiles,activity.filesName, activity = activity)//
+                                        Server(activity, selectedFiles,activity.filesName, activity = activity)
                                     }
                                 }) {
                                 Text("Send it ", color = Color.White)
@@ -129,3 +131,5 @@ fun Send(navController: NavController,activity: MainActivity){
         }
 }
 }
+
+

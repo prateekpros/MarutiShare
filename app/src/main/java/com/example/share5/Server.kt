@@ -145,7 +145,8 @@ private fun uriToByteArray(contentResolver: ContentResolver, uri: Uri, outputStr
         if (inputStream != null) {
 
             var totalBytesRead = 0L
-            val startTime = System.currentTimeMillis()
+
+             val startTime = System.currentTimeMillis()
 
             while (inputStream.read(buffer).also { bytesRead = it } != -1) {
                 totalBytesRead += bytesRead
@@ -166,13 +167,8 @@ private fun uriToByteArray(contentResolver: ContentResolver, uri: Uri, outputStr
     } catch (e: IOException) {
         Log.e("App", "Failed to read file: ${e.message}")
     }
-//    finally {
-//        try {
-//            inputStream?.close()
-//        } catch (e: IOException) {
-//            Log.e("App", "Failed to close input stream: ${e.message}")
-//        }
-//    }
+
+
  return  fileSize
 }
 const val BUFFER_SIZE = 8192
