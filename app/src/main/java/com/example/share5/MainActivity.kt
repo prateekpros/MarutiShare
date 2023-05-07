@@ -108,21 +108,11 @@ class MainActivity : ComponentActivity() {
                         lifecycleOwner.lifecycle.removeObserver(observer)
                     }
                 })
-//          var selectedFiles by rememberSaveable{ mutableStateOf(emptyList<Uri>()) }
-          //  var txt by remember{ mutableStateOf("") }
 
             Share3Theme {
                 navController= rememberNavController()
                 SetupNavGraph(navController,this)
 
-//                Surface(
-//                    modifier = Modifier.fillMaxSize(),
-//                    color = MaterialTheme.colors.background
-//                ) {
-//
-//
-//                }
-               // Display(Peers = Peers, activity =this )
 
             }
 
@@ -155,32 +145,20 @@ class MainActivity : ComponentActivity() {
         return if ((mediaDir != null) && mediaDir.exists()) mediaDir else filesDir
     }
 
-//    fun changeDeviceName(name:String) {
-//        manager.setDeviceName(channel, randomName, object : WifiP2pManager.ActionListener {
-//            override fun onSuccess() {
-//                Log.d(TAG, "Device name changed to $randomName")
-//            }
-//
-//            override fun onFailure(reason: Int) {
-//                Log.e(TAG, "Failed to change device name: $reason")
-//            }
-//        })
-//
+}
+
+//val countDownTimer = object: CountDownTimer(2000, 1000) {
+//    override fun onTick(millisUntilFinished: Long) {
+//        // Code to be executed every second
+//        val secondsLeft = millisUntilFinished / 1000
+//        Log.d("Countdown", "$secondsLeft seconds left")
 //    }
-}
-
-val countDownTimer = object: CountDownTimer(2000, 1000) {
-    override fun onTick(millisUntilFinished: Long) {
-        // Code to be executed every second
-        val secondsLeft = millisUntilFinished / 1000
-        Log.d("Countdown", "$secondsLeft seconds left")
-    }
-
-    override fun onFinish() {
-        // Code to be executed when the timer finishes counting
-        Log.d("Countdown", "Timer finished")
-    }
-}
+//
+//    override fun onFinish() {
+//        // Code to be executed when the timer finishes counting
+//        Log.d("Countdown", "Timer finished")
+//    }
+//}
 
 @SuppressLint("MissingPermission")
 fun discoverPeers(activity: MainActivity) {

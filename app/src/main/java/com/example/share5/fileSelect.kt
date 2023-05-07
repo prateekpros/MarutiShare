@@ -56,10 +56,11 @@ fun App(selectedFiles: List<Uri>, add:(List<Uri>)->Unit, minus:(Uri)->Unit){
         FilePicker(onFilesSelected = { uris ->
             add(uris)
         })
+        var names= emptySet<String>()
 
         if (selectedFiles.isNotEmpty()) {
             Log.d("App","$selectedFiles")
-            SelectedFilesCard(selectedUris = selectedFiles, remove = {
+            names = SelectedFilesCard(selectedUris = selectedFiles, remove = {
                 minus(it)
             }
             )
@@ -108,54 +109,12 @@ fun FilePicker(onFilesSelected: (List<Uri>) -> Unit) {
         }
 
     }
-//    Scaffold(modifier = Modifier.padding(0.dp),
-//        bottomBar = {
-//            BottomAppBar(elevation = 0.dp,
-//                backgroundColor = "#6f43fa".color,
-//                contentColor = Color.White,
-//                content = {
-//                    Row(
-//                        horizontalArrangement = Arrangement.SpaceAround,
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .padding(4.dp)
-//                    ) {
-//                        IconButton(onClick = {}) {
-//                            Icon(Icons.Default.Home, contentDescription = "Home")
-//                        }
-//                        IconButton(onClick = {}) {
-//                            Icon(Icons.Default.Settings, contentDescription = "Settings")
-//                        }
-//                    }
-//                }
-//            )
-//        },
-//        content = {
-//            it
-//            Image(
-//                painter = painterResource(id = R.drawable.svg_water_wave_animation),
-//                contentDescription = "design",
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .offset(y = 456.dp)
-//                    .size(400.dp)
-//                    .rotate(180f),
-//            )
-////            Button(onClick = {
-////                CoroutineScope(Dispatchers.IO).launch {
-////                    Server(activity,selectedFiles,activity.filesName)
-////                }
-////            }) {
-////                Text("Send it ")
-////            }
-//        })
+
 }
 
 @Composable
-fun SelectedFilesCard(selectedUris: List<Uri>,remove:(Uri) ->Unit,) {
-//    Button(onClick = {}, modifier = Modifier.fillMaxWidth()) {
-//        Text(text = "Select Files")
-//    }
+fun SelectedFilesCard(selectedUris: List<Uri>,remove:(Uri) ->Unit):Set<String> {
+    var names = emptySet<String>()
     LazyColumn {
         itemsIndexed(selectedUris.toList()) { index ,uri ->
             Card(
@@ -167,8 +126,11 @@ fun SelectedFilesCard(selectedUris: List<Uri>,remove:(Uri) ->Unit,) {
                     .fillMaxWidth()
 
             ) {
+
+               val name = getFileName(uri = uri)
+                names +=name
                 Box() {
-                    IconButton(onClick = { remove(uri)}, modifier = Modifier.align(Alignment.CenterEnd)) {
+                    IconButton(onClick = { remove(uri); names-=name}, modifier = Modifier.align(Alignment.CenterEnd)) {
 
                         Icon(imageVector = Icons.Default.Delete , contentDescription = null, modifier = Modifier.padding(5.dp))
                     }
@@ -188,7 +150,7 @@ fun SelectedFilesCard(selectedUris: List<Uri>,remove:(Uri) ->Unit,) {
             }
         }
     }
-
+ return names
 }
 
 

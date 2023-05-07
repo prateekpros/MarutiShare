@@ -98,7 +98,8 @@ fun ClientPage(navHostController: NavHostController,activity: MainActivity){
                 }
             })
     }
-    LoadingScreen()
+
+   // LoadingScreen()
 }
 
 @Composable

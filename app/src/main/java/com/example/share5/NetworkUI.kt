@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.dp
 fun CustomComponent(
     canvasSize: Dp = 300.dp,
     indicatorValue: Int = 10,
-    maxIndicatorValue: Int = 100,
+    maxIndicatorValue: Int = 60,
     backgroundIndicatorColor: Color = MaterialTheme.colors.onSurface.copy(alpha = 0.1f),
     backgroundIndicatorStrokeWidth: Float = 100f,
     foregroundIndicatorColor: Color = MaterialTheme.colors.primary,

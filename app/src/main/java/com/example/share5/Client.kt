@@ -85,10 +85,17 @@ private fun byteArrayToUri(contentResolver: ContentResolver, directory: File, fi
     var fileSize = 0L
 
     try {
+        val startTime = System.currentTimeMillis()
         var byteArray = receiveByteArray(inputStream)
         while (byteArray.isNotEmpty()&&fileSize < size) {
             outputStream.write(byteArray)
             fileSize += byteArray.size
+            val endTime = System.currentTimeMillis()
+            val timeTaken = (endTime - startTime) / 1000.0 // in seconds
+            if (fileSize > 0) {
+                val speed = fileSize / (timeTaken*1000000) // in bytes per second
+                println("Transfer speed: $speed MB/second")
+            }
             if (fileSize < size) {
                 byteArray = receiveByteArray(inputStream)
             }
