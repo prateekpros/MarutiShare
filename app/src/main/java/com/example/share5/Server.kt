@@ -96,6 +96,7 @@ suspend fun Server(context: Context, uris: List<Uri>, fileNames: List<String>, a
                 val uri = uris[i]
                 val fileName = fileNames[i]
                 Log.d("App","file name  = $fileName")
+
                 // Send the file name and size
                 dataOutputStream.writeInt(fileName.length)
                 dataOutputStream.writeBytes(fileName)
@@ -103,12 +104,10 @@ suspend fun Server(context: Context, uris: List<Uri>, fileNames: List<String>, a
                 val size = inputStream?.available()?.toLong() ?: -1
                 inputStream?.close()
                 dataOutputStream.writeLong(size)
-//                dataOutputStream.flush()
 
                 // Send the file contents
                 uriToByteArray(context.contentResolver, uri, outputStream, activity)
                 dataOutputStream.flush()
-
 
             }
 

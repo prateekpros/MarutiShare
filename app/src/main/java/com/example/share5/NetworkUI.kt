@@ -1,8 +1,16 @@
 package com.example.share5
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationSpec
+import androidx.compose.animation.core.AnimationVector
+import androidx.compose.animation.core.TwoWayConverter
+import androidx.compose.animation.core.VectorConverter
+import androidx.compose.animation.core.VisibilityThreshold
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.animateIntAsState
+import androidx.compose.animation.core.animateValueAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -24,23 +32,26 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.launch
+import kotlin.math.round
 
 
 @Composable
 fun CustomComponent(
+    activity: MainActivity,
     canvasSize: Dp = 300.dp,
-    indicatorValue: Int = 10,
-    maxIndicatorValue: Int = 60,
+    indicatorValue: Float = 0f,
+    maxIndicatorValue: Float = 50f,
     backgroundIndicatorColor: Color = MaterialTheme.colors.onSurface.copy(alpha = 0.1f),
     backgroundIndicatorStrokeWidth: Float = 100f,
-    foregroundIndicatorColor: Color = MaterialTheme.colors.primary,
+    foregroundIndicatorColor: Color = "#6f43fa".color,
     foregroundIndicatorStrokeWidth: Float = 100f,
     indicatorStrokeCap: StrokeCap = StrokeCap.Round,
-    bigTextFontSize: TextUnit = MaterialTheme.typography.h3.fontSize,
+    bigTextFontSize: TextUnit = MaterialTheme.typography.h4.fontSize,
     bigTextColor: Color = MaterialTheme.colors.onSurface,
-    bigTextSuffix: String = "GB",
-    smallText: String = "Remaining",
+    bigTextSuffix: String = indicatorValue.toString(),
+    smallText: String = "MBps",
     smallTextFontSize: TextUnit = MaterialTheme.typography.h6.fontSize,
     smallTextColor: Color = MaterialTheme.colors.onSurface.copy(alpha = 0.3f)
 ) {
@@ -53,7 +64,7 @@ fun CustomComponent(
 
     var animatedIndicatorValue by remember { mutableStateOf(0f) }
     LaunchedEffect(key1 = allowedIndicatorValue) {
-        animatedIndicatorValue = allowedIndicatorValue.toFloat()
+        animatedIndicatorValue = allowedIndicatorValue
     }
 
     val percentage =
@@ -61,16 +72,16 @@ fun CustomComponent(
 
     val sweepAngle by animateFloatAsState(
         targetValue = (2.4 * percentage).toFloat(),
-        animationSpec = tween(1000)
+        animationSpec = tween(200)
     )
 
-    val receivedValue by animateIntAsState(
+    val receivedValue by animateFloatAsState(
         targetValue = allowedIndicatorValue,
         animationSpec = tween(1000)
     )
 
     val animatedBigTextColor by animateColorAsState(
-        targetValue = if (allowedIndicatorValue == 0)
+        targetValue = if (allowedIndicatorValue == 0f)
             MaterialTheme.colors.onSurface.copy(alpha = 0.3f)
         else
             bigTextColor,
@@ -160,7 +171,7 @@ fun DrawScope.foregroundIndicator(
 
 @Composable
 fun EmbeddedElements(
-    bigText: Int,
+    bigText: Float,
     bigTextFontSize: TextUnit,
     bigTextColor: Color,
     bigTextSuffix: String,
@@ -175,7 +186,7 @@ fun EmbeddedElements(
         textAlign = TextAlign.Center
     )
     Text(
-        text = "$bigText ${bigTextSuffix.take(2)}",
+        text = "$bigText",// ${bigTextSuffix.take(2)}",
         color = bigTextColor,
         fontSize = bigTextFontSize,
         textAlign = TextAlign.Center,
@@ -183,8 +194,52 @@ fun EmbeddedElements(
     )
 }
 
-@Composable
-@Preview(showBackground = true)
-fun CustomComponentPreview() {
-    CustomComponent()
-}
+
+//private val intDefaultSpring = spring(visibilityThreshold = Int.VisibilityThreshold)
+//@Composable
+//fun animateIntAsState_(
+//    targetValue: Int,
+//    animationSpec: AnimationSpec<Int> = intDefaultSpring,
+//    finishedListener: ((Int) -> Unit)? = null
+//): State<Int> {
+//    return animateValueAsState_(
+//        targetValue, Int.VectorConverter, animationSpec, finishedListener = finishedListener
+//    )
+//}
+//
+//@Composable
+//fun <T, V : AnimationVector> animateValueAsState_(
+//    targetValue: T,
+//    typeConverter: TwoWayConverter<T, V>,
+//    animationSpec: AnimationSpec<T> = remember {
+//        spring(visibilityThreshold = visibilityThreshold)
+//    },
+//    visibilityThreshold: T? = null,
+//    finishedListener: ((T) -> Unit)? = null
+//): State<T> {
+//
+//    val animatable = remember { Animatable(targetValue, typeConverter) }
+//    val listener by rememberUpdatedState(finishedListener)
+//    val animSpec by rememberUpdatedState(animationSpec)
+//    val channel = remember { Channel<T>(Channel.CONFLATED) }
+//    SideEffect {
+//        channel.trySend(targetValue)
+//    }
+//    LaunchedEffect(channel) {
+//        for (target in channel) {
+//            // This additional poll is needed because when the channel suspends on receive and
+//            // two values are produced before consumers' dispatcher resumes, only the first value
+//            // will be received.
+//            // It may not be an issue elsewhere, but in animation we want to avoid being one
+//            // frame late.
+//            val newTarget = channel.tryReceive().getOrNull() ?: target
+//            launch {
+//                if (newTarget != animatable.targetValue) {
+//                    animatable.animateTo(newTarget, animSpec)
+//                    listener?.invoke(animatable.value)
+//                }
+//            }
+//        }
+//    }
+//    return animatable.asState()
+//}

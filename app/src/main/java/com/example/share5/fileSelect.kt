@@ -114,7 +114,7 @@ fun FilePicker(onFilesSelected: (List<Uri>) -> Unit) {
 
 @Composable
 fun SelectedFilesCard(selectedUris: List<Uri>,remove:(Uri) ->Unit):Set<String> {
-    var names = emptySet<String>()
+    val names = emptySet<String>().toMutableSet()
     LazyColumn {
         itemsIndexed(selectedUris.toList()) { index ,uri ->
             Card(
