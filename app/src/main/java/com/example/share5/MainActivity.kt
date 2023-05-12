@@ -2,40 +2,29 @@ package com.example.share5
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Activity
-import android.content.ContentValues.TAG
 import android.content.Context
-import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.net.wifi.WpsInfo
 import android.net.wifi.p2p.WifiP2pConfig
 
 import android.net.wifi.p2p.WifiP2pDevice
+import android.net.wifi.p2p.WifiP2pInfo
 
 import android.net.wifi.p2p.WifiP2pManager
 
 import android.os.Bundle
-import android.os.CountDownTimer
 import android.os.Handler
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.core.app.ActivityCompat
 
-import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.widget.ConstraintSet
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 
@@ -44,9 +33,6 @@ import androidx.navigation.compose.rememberNavController
 import com.example.share5.ui.theme.Share3Theme
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.io.File
 
 import java.net.*
@@ -67,6 +53,11 @@ class MainActivity : ComponentActivity() {
     lateinit var navController: NavHostController
     var filesName = emptyList<String>()
     var discovered by mutableStateOf(false)
+    var cnet by mutableStateOf(0f)
+    var numFiles = 0
+    val port:Int = 36912
+    var grOwner:Boolean = false
+    var info:WifiP2pInfo? = null
 
 
     private val intentFilter = IntentFilter().apply {
@@ -82,7 +73,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-       // requestStoragePermission()
+
 
         setContent {
             val permissionState = rememberMultiplePermissionsState(
@@ -147,19 +138,6 @@ class MainActivity : ComponentActivity() {
 
 }
 
-//val countDownTimer = object: CountDownTimer(2000, 1000) {
-//    override fun onTick(millisUntilFinished: Long) {
-//        // Code to be executed every second
-//        val secondsLeft = millisUntilFinished / 1000
-//        Log.d("Countdown", "$secondsLeft seconds left")
-//    }
-//
-//    override fun onFinish() {
-//        // Code to be executed when the timer finishes counting
-//        Log.d("Countdown", "Timer finished")
-//    }
-//}
-
 @SuppressLint("MissingPermission")
 fun discoverPeers(activity: MainActivity) {
     refresh(activity = activity)
@@ -203,28 +181,26 @@ fun connect(activity: MainActivity, device: WifiP2pDevice) {
     Log.i("App", "Connection request sent to ${device.deviceName}")
 
     val config = WifiP2pConfig().apply {
+//        groupOwnerIntent = -2
         deviceAddress = device.deviceAddress
         wps.setup = WpsInfo.PBC
+
     }
+
+
+    Log.d("App","device intent value = ${config.groupOwnerIntent}")
 
     activity.manager.connect(activity.channel, config, object : WifiP2pManager.ActionListener {
 
         override fun onSuccess() {
+           Log.d("App","-------------connected ------------")
 
-            Handler().postDelayed({
-                activity.manager.requestConnectionInfo(activity.channel) { info ->
-                    if (info?.groupOwnerAddress != null) {
-                        activity.host = info.groupOwnerAddress
-                    } else {
-                        Log.e("App", "Connection info is null")
-                    }
                 }
-            }, 2000) // Wait for 2 seconds before requesting the connection info
-
-        }
 
         override fun onFailure(reason: Int) {
+
             Log.i("App", "Could not connect")
+
         }
     })
 }
@@ -243,6 +219,47 @@ fun disconnect(activity: MainActivity){
             }
         })
     }
+}
+
+fun changeGroupOwner(activity: MainActivity) {
+    // Disband the existing group
+    activity.manager.removeGroup(activity.channel, object : WifiP2pManager.ActionListener {
+        override fun onSuccess() {
+            // Group removal successful, initiate group formation
+            createGroup(activity)
+        }
+
+        override fun onFailure(reason: Int) {
+            // Group removal failed, handle the failure scenario
+            Log.e("App", "Failed to remove group. Reason: $reason")
+        }
+    })
+}
+
+
+private fun createGroup(activity: MainActivity) {
+    if (ActivityCompat.checkSelfPermission(
+            activity.applicationContext,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(
+            activity.applicationContext,
+            Manifest.permission.NEARBY_WIFI_DEVICES
+        ) != PackageManager.PERMISSION_GRANTED
+    ) {
+        activity.manager.createGroup(activity.channel, object : WifiP2pManager.ActionListener {
+            override fun onSuccess() {
+                // Group creation successful
+                Log.d("App", "New group created")
+            }
+
+            override fun onFailure(reason: Int) {
+                // Group creation failed, handle the failure scenario
+                Log.e("App", "Failed to create group. Reason: $reason")
+            }
+        })
+        return
+    }
+
 }
 
 
