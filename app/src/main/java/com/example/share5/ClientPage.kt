@@ -51,6 +51,13 @@ import kotlinx.coroutines.launch
 @Composable
 fun ClientPage(navHostController: NavHostController,activity: MainActivity){
 
+
+    if(activity.grOwner)
+    {
+        Log.d("App","------------growner request sent -------")
+        activity.info?.isGroupOwner  = false
+    }
+
     CoroutineScope(Dispatchers.IO).launch {
         Client(activity,device = activity.host,activity)
     }

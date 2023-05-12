@@ -3,6 +3,7 @@ package com.example.share5
 
 import android.net.Uri
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -30,6 +31,11 @@ import kotlinx.coroutines.launch
 @Composable
 fun Send(navController: NavController,activity: MainActivity){
 
+    if(!activity.grOwner)
+    {
+        Log.d("App","------------growner request sent -------")
+        activity.info?.isGroupOwner  = true
+    }
 
 
     var selectedFiles by rememberSaveable{ mutableStateOf(emptyList<Uri>()) }
@@ -101,9 +107,11 @@ fun Send(navController: NavController,activity: MainActivity){
             }
 
             if (selectedFiles != emptyList<Uri>()) {
-
-                Button(modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 25.dp,top=10.dp)
-                    ,
+                Box(modifier = Modifier.fillMaxWidth()) {
+                Button(modifier = Modifier
+                    .align(Alignment.Center)
+                    .padding(bottom = 25.dp, top = 10.dp)
+                    .offset(y = 400.dp),
                     colors = ButtonDefaults.buttonColors(
                         backgroundColor = "#6f43fa".color,
                         contentColor = Color.White
@@ -114,6 +122,7 @@ fun Send(navController: NavController,activity: MainActivity){
                         }
                     }) {
                     Text("Send it ", color = Color.White)
+                }
                 }
 
             }

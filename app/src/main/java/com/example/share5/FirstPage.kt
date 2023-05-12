@@ -219,7 +219,7 @@ fun HomeScreen(navHostController: NavHostController,activity: MainActivity){
                         //.background(color = Blue2)
                         .padding(10.dp)
                         .align(Alignment.TopCenter)
-                        .offset(y = 500.dp),
+                        .offset(y = 400.dp),
                         //.align(Alignment.Center),
                         //.align(Alignment.Center)
                         shape = CircleShape,

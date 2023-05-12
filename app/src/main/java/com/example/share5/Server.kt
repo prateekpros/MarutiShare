@@ -17,70 +17,24 @@ import java.net.InetAddress
 import java.net.ServerSocket
 import java.net.Socket
 
-//----------
-//@RequiresApi(Build.VERSION_CODES.M)
-//suspend fun Server(context: Context, uris: List<Uri>, fileNames: List<String>, activity: MainActivity) {
-//    withContext(Dispatchers.IO) {
-//        try {
-//            // Create server socket
-//            Log.d("App", "Server on")
-//            val serverSocket = ServerSocket(37682)
-//            //serverSocket.soTimeout=500000
-//
-//            // Wait for a client to connect
-//            val clientSocket = serverSocket.accept()
-//            Log.d("App", "Client connected")
-//
-//            // Send the number of files to the client.
-//            val numFiles = uris.size
-//            val outputStream = clientSocket.getOutputStream()
-//            val dataOutputStream = DataOutputStream(outputStream)
-//            dataOutputStream.writeInt(numFiles)
-//
-//            //-----------------
-//            // Send each file
-//            for (i in uris.indices) {
-//                val uri = uris[i]
-//                val fileName = fileNames[i]
-//                Log.d("App","file name  = $fileName")
-//                // Send the file name and size
-//                dataOutputStream.writeInt(fileName.length)
-//                dataOutputStream.writeBytes(fileName)
-//                dataOutputStream.flush()
-//
-//                // Send the file contents
-//                uriToByteArray(context.contentResolver, uri, outputStream, activity)
-//
-//                // Send the separator between the files
-//                if (i < uris.size ) {
-//                    dataOutputStream.writeBytes("\n")
-//                }
-//
-//            }
-//
-//            // Close the connection
-//            clientSocket.close()
-//            serverSocket.close()
-//        } catch (e: IOException) {
-//            Log.e("App", "Failed to start server: ${e.message}")
-//
-//        }
-//    }
-//}
-///////////////////////////////////////
 
 @RequiresApi(Build.VERSION_CODES.M)
 suspend fun Server(context: Context, uris: List<Uri>, fileNames: List<String>, activity: MainActivity) {
     withContext(Dispatchers.IO) {
+        val serverSocket= ServerSocket(activity.port)
+
         try {
             // Create server socket
+            //serverSocket =
             Log.d("App", "Server on")
-            val serverSocket = ServerSocket(37682)
-            //serverSocket.soTimeout=500000
-
+            serverSocket.soTimeout = 3000
+           val clientSocket = serverSocket.accept()
             // Wait for a client to connect
-            val clientSocket = serverSocket.accept()
             Log.d("App", "Client connected")
+
+            val clientAddress = clientSocket.inetAddress.hostAddress
+            val clientPort = clientSocket.port
+            Log.d("App", "Client connected: $clientAddress:$clientPort")
 
             // Send the number of files to the client.
             val numFiles = uris.size
@@ -93,6 +47,7 @@ suspend fun Server(context: Context, uris: List<Uri>, fileNames: List<String>, a
             //-----------------
             // Send each file
             for (i in uris.indices) {
+
                 val uri = uris[i]
                 val fileName = fileNames[i]
                 Log.d("App","file name  = $fileName")
@@ -110,13 +65,13 @@ suspend fun Server(context: Context, uris: List<Uri>, fileNames: List<String>, a
                 dataOutputStream.flush()
 
             }
-
-
             // Close the connection
             clientSocket.close()
             serverSocket.close()
         } catch (e: IOException) {
             Log.e("App", "Failed to start server: ${e.message}")
+            serverSocket.close()
+
         }
     }
 }
@@ -172,107 +127,18 @@ private fun uriToByteArray(contentResolver: ContentResolver, uri: Uri, outputStr
 }
 const val BUFFER_SIZE = 8192
 
-/////////////////////////////////////////------------------------------------------------------
-
-//@RequiresApi(android.os.Build.VERSION_CODES.M)
-//suspend fun Server(context: Context, uris: List<Uri>, fileNames: List<String>, activity: MainActivity) {
-//    withContext(Dispatchers.IO) {
-//        try {
-//            // Create server socket
-//            Log.d("App", "Server on")
-//            val serverSocket = ServerSocket(37682)
-//            serverSocket.soTimeout=600000
-//
-//            // Wait for a client to connect
-//            val clientSocket = serverSocket.accept()
-//            Log.d("App", "Client connected")
-//
-//
-//            // Send the number of files to the client.
-//            val numFiles = uris.size
-//            val outputStream = clientSocket.getOutputStream()
-//            val inputStream = clientSocket.getInputStream()
-//            val dataInputStream = DataInputStream(inputStream)
-//            val dataOutputStream = DataOutputStream(outputStream)
-//            dataOutputStream.writeInt(numFiles)
-//
-//            //-----------------
-//            // Send each file
-//            for (i in uris.indices) {
-//                val uri = uris[i]
-//                val fileName = fileNames[i]
-//                Log.d("App", "file name  = $fileName")
-//                // Send the file name and size
-//                dataOutputStream.writeInt(fileName.length)
-//                dataOutputStream.writeBytes(fileName)
-//
-//                // Send the file contents
-//                uriToByteArray(context.contentResolver, uri, outputStream, activity)
-//
-////                while(dataInputStream.available() == 0)
-////                {
-////                    delay(500)
-////                }
-//
-//                if(dataInputStream.readBoolean()) {
-//                    Log.d("App","file : $fileName received by client")
-//                }
-//                else{
-//                    Log.d("App","file : $fileName is not received by client")
-//                }
-//                dataOutputStream.flush()
-//
-//            }
-//
-//            // Close the connection
-//            clientSocket.close()
-//            serverSocket.close()
-//        } catch (e: IOException) {
-//            Log.e("App", "Failed to start server: ${e.message}")
-//        }
-//    }
-//}
-//
-//
-//private fun sendByteArray(outputStream: OutputStream, byteArray: ByteArray) {
-//    val dataOutputStream = DataOutputStream(outputStream)
-//    dataOutputStream.writeInt(byteArray.size)
-//    dataOutputStream.write(byteArray)
-//    dataOutputStream.close()
-//
-//}
-//
-//
-//
-//@RequiresApi(Build.VERSION_CODES.M)
-//private fun uriToByteArray(contentResolver: ContentResolver, uri: Uri, outputStream: OutputStream, activity: MainActivity){
-//    var fileSize = 0L
-//    var inputStream: InputStream? = null
-//
-//
-//    try {
-//        inputStream = contentResolver.openInputStream(uri)
-//        val buffer = ByteArray(BUFFER_SIZE)
-//        var bytesRead: Int
-//
-//        if (inputStream != null) {
-//
-//            var totalBytesRead = 0L
-//
-//
-//            while (inputStream.read(buffer).also { bytesRead = it } != -1) {
-//                totalBytesRead += bytesRead
-//                sendByteArray(outputStream, buffer.copyOf(bytesRead))
-//                fileSize += bytesRead
-//            }
-//
-//        }
-//        inputStream?.close()
-//
-//        Log.d("App", "File Sent : $fileSize bytes")
-//    } catch (e: IOException) {
-//        Log.e("App", "Failed to send file: ${e.message}")
-//    }
-//
-//}
-//const val BUFFER_SIZE = 8192
+fun isPortListening(port: Int): Boolean {
+    var serverSocket: ServerSocket? = null
+    try {
+        // Try to bind the port
+        serverSocket = ServerSocket(port)
+        // If the port is successfully bound, it means it is listening
+        return true
+    } catch (e: Exception) {
+        // An exception occurred, indicating that the port is not listening
+        return false
+    } finally {
+        // Close the server socket to release the resources
+       serverSocket?.close()
+    }
+}

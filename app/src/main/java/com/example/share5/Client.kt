@@ -8,6 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.*
 import java.net.InetAddress
+import java.net.ServerSocket
 import java.net.Socket
 import kotlin.math.round
 
@@ -15,13 +16,18 @@ import kotlin.math.round
 suspend fun Client(context: Context, device: InetAddress?, activity: MainActivity) {
 
     val directory = activity.getOutputDirectory()
+    var i = 1
 
     withContext(Dispatchers.IO) {
+
+        var clientSocket= Socket()
+        clientSocket.soTimeout=3000
+
         try {
             // Connect to server
             Log.d("App", "Client connecting...")
-            val clientSocket = Socket(device, 37682)
-            Log.d("App", "Client connected")
+             clientSocket = Socket(device, activity.port)
+            Log.d("App", "Client connected i =$i")
 
             // Receive the number of files from the server
             val inputStream = clientSocket.getInputStream()
@@ -46,15 +52,14 @@ suspend fun Client(context: Context, device: InetAddress?, activity: MainActivit
                 // Receive the file data from the server
                 val fileSize = byteArrayToUri(context.contentResolver, directory, fileName, clientSocket.getInputStream(),size,activity).toDouble()/1024/1024
                 Log.d("App", "File received: $fileSize MB")
-
             }
-
             Log.d("App","out of loop")
-
             // Close the connection
             clientSocket.close()
         } catch (e: IOException) {
-            Log.e("App", "Failed to connect to server: ${e.message}")
+            Log.e("App",  " i = $i: Failed to connect to server: ${e.message}")
+            clientSocket.close()
+            i=1+1
         }
     }
 }
